@@ -1,0 +1,4 @@
+TO RUN:
+./run.py full_data.txt name_of_entity1 name_of_entity2 num_of_different_paths
+
+Eg: ./run.py full_data.txt /m/017dcd /m/0184jc 5
