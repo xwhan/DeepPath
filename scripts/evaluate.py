@@ -9,10 +9,10 @@ from keras.layers import Dense, Activation
 
 relation = sys.argv[1]
 
-dataPath_ = 'NELL-995/tasks/'  + relation
+dataPath_ = '../NELL-995/tasks/'  + relation
 featurePath = dataPath_ + '/path_to_use.txt'
 feature_stats = dataPath_ + '/path_stats.txt'
-relationId_path = 'NELL-995/relation2id.txt'
+relationId_path = '../NELL-995/relation2id.txt'
 
 def train(kb, kb_inv, named_paths):
 	f = open(dataPath_ + '/train.pairs')
@@ -69,11 +69,6 @@ def get_features():
 
 	for line in paths:
 		path = line.rstrip()
-
-		# if path not in stats:
-		# 	continue
-		# elif max_freq > 1 and stats[path] < 2:
-		# 	continue
 
 		length = len(path.split(' -> '))
 
@@ -194,29 +189,17 @@ def evaluate_logic():
 		if item[1] == 1:
 			correct +=  1
 			ranks.append(correct/(1.0+idx_))
-			#break
-	#if len(ranks) ==0:
-	#	ranks.append(0)
 	aps.append(np.mean(ranks))
 
 	score_label = zip(score_all, test_labels)
 	score_label_ranked = sorted(score_label, key = lambda x:x[0], reverse=True)
-
-	# hits = 0 
-	# for idx, item in enumerate(score_label_ranked):
-	# 	if item[1] == 1:
-	# 		hits += 1
-	# 	if idx == 9:
-	# 		print 'P@10: ', hits/10.0
-	# 	elif idx ==99:
-	# 		print 'P@100: ', hits/100.0
-	# 		break
 
 	mean_ap = np.mean(aps)
 	print 'RL MAP: ', mean_ap
 
 
 def bfs_two(e1,e2,path,kb,kb_inv):
+	'''the bidirectional search for reasoning'''
 	start = 0
 	end = len(path)
 	left = set()

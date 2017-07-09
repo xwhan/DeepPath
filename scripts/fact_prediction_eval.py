@@ -6,13 +6,13 @@ from BFS.KB import *
 
 relation = sys.argv[1]
 
-dataPath_ = 'NELL-995/tasks/'  + relation
+dataPath_ = '../NELL-995/tasks/'  + relation
 featurePath = dataPath_ + '/path_to_use.txt'
 feature_stats = dataPath_ + '/path_stats.txt'
-relationId_path ='NELL-995/' + 'relation2id.txt'
-ent_id_path = 'NELL-995/' + 'entity2id.txt'
-rel_id_path = 'NELL-995/' + 'relation2id.txt'
-test_data_path = 'NELL-995/tasks/'  + relation + '/sort_test.pairs'
+relationId_path ='../NELL-995/' + 'relation2id.txt'
+ent_id_path = '../NELL-995/' + 'entity2id.txt'
+rel_id_path = '../NELL-995/' + 'relation2id.txt'
+test_data_path = '../NELL-995/tasks/'  + relation + '/sort_test.pairs'
 
 def bfs_two(e1,e2,path,kb,kb_inv):
 	start = 0
@@ -316,9 +316,6 @@ for idx, sample in enumerate(test_pairs):
 		if len(ranks)==0:
 			ranks.append(0)
 		aps.append(np.mean(ranks))
-		# if len(aps) % 10 == 0:
-			# print 'How many queries:', len(aps)
-			# print np.mean(aps)
 		y_true = []
 		y_score = []
 
@@ -335,9 +332,6 @@ for idx, sample in enumerate(test_pairs):
 		y_score.append(score)
 		y_true.append(test_labels[idx])
 
-
-# mean_ap = np.mean(aps)
-# print 'MAP: ', mean_ap
 
 score_label = zip(score_all, test_labels)
 stats = sorted(score_label, key = lambda x:x[0], reverse=True)

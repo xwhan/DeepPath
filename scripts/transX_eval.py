@@ -5,11 +5,11 @@ import numpy as np
 
 relation = sys.argv[1]
 
-dataPath_ = 'NELL-995/tasks/'  + relation
+dataPath_ = '../NELL-995/tasks/'  + relation
 
-ent_id_path = 'NELL-995/' + 'entity2id.txt'
-rel_id_path = 'NELL-995/' + 'relation2id.txt'
-test_data_path = 'NELL-995/tasks/'  + relation + '/sort_test.pairs'
+ent_id_path = '../NELL-995/' + 'entity2id.txt'
+rel_id_path = '../NELL-995/' + 'relation2id.txt'
+test_data_path = '../NELL-995/tasks/'  + relation + '/sort_test.pairs'
 
 f1 = open(ent_id_path)
 f2 = open(rel_id_path)
@@ -88,9 +88,7 @@ for idx, sample in enumerate(test_pairs):
 		if len(ranks)==0:
 			ranks.append(0)
 		aps.append(np.mean(ranks))
-		# if len(aps) % 10 == 0:
-		# 	print 'How many queries:', len(aps)
-		# 	print np.mean(aps)
+
 		y_true = []
 		y_score = []
 
@@ -111,17 +109,6 @@ for idx, sample in enumerate(test_pairs):
 mean_ap = np.mean(aps)
 print 'TransX MAP: ', mean_ap
 
-# score_label = zip(score_all, test_labels)
-# stats = sorted(score_label, key = lambda x:x[0], reverse=True)
-
-# correct = 0
-# ranks = []
-# for idx, item in enumerate(stats):
-# 	if item[1] == 1:
-# 		correct += 1
-# 		ranks.append(correct/(1.0+idx))
-# ap1 = np.mean(ranks)
-# print 'TransX: ', ap1
 
 
 

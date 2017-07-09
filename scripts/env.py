@@ -3,7 +3,7 @@ import random
 from utils import *
 
 class Env(object):
-	"""docstring for env"""
+	"""knowledge graph environment definition"""
 	def __init__(self, dataPath, task=None):
 		f1 = open(dataPath + 'entity2id.txt')
 		f2 = open(dataPath + 'relation2id.txt')
@@ -40,9 +40,6 @@ class Env(object):
 					self.kb.append(line)
 
 		self.die = 0 # record how many times does the agent choose an invalid path
-
-		# self.length = 0
-
 
 	def interact(self, state, action):
 		'''

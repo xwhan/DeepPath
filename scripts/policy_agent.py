@@ -176,22 +176,6 @@ def REINFORCE(training_pairs, policy_nn, num_episodes):
 
 	return 
 
-# def train():
-# 	tf.reset_default_graph()
-# 	policy_network = PolicyNetwork()
-
-# 	f = open(relationPath)
-# 	training_pairs = f.readlines()
-# 	f.close()
-
-# 	saver = tf.train.Saver()
-# 	with tf.Session() as sess:
-# 		sess.run(tf.global_variables_initializer())
-# 		stats_rewards, stats_lengths = REINFORCE(training_pairs, policy_network, 290)
-# 		saver.save(sess, "models/policy_teacher_" + relation)
-
-# 	print 'model and stats saved!'
-
 def retrain():
 	print 'Start retraining'
 	tf.reset_default_graph()
