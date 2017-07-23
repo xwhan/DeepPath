@@ -1,4 +1,4 @@
-# Reinforcement Learning for Knowledge Graph Reasoning
+# Deep Reinforcement Learning for Knowledge Graph Reasoning
 We study the problem of learning to reason in large scale knowledge graphs (KGs). More specifically, we describe a novel reinforcement learning framework for learning multi-hop relational paths: we use a policy-based agent with continuous states based on knowledge graph embeddings, which reasons in a KG vector-space by sampling the most promising relation to extend its path. In contrast to prior work, our approach includes a reward function that takes the **accuravy**, **diversity**, and **efficiency** into consideration. Experimentally, we show that our proposed method outperforms a path-ranking based algorithm and knowledge graph embedding methods on Freebase and Never-Ending Language Learning datasets.
 
 ## Access the dataset
@@ -22,7 +22,8 @@ Download the knowledge graph dataset [NELL-995](http://cs.ucsb.edu/~xwhan/datase
 2. `kb_env_rl.txt`: we add inverse triples of all triples in `raw.kb`, this file is used as the KG for reasoning
 3. `entity2vec.bern/relation2vec.bern`: transE embeddings to represent out RL states, can be trained using [TransX implementations by thunlp](https://github.com/thunlp/Fast-TransX)
 4. `tasks/`: each task is a particular reasoning relation
-    * `tasks/${relation}/*.vec`: trained TransD(H) Embeddings
+    * `tasks/${relation}/*.vec`: trained TransH Embeddings
+    * `tasks/${relation}/*.vec_D`: trained TransD Embeddings
     * `tasks/${relation}/*.bern`: trained TransR Embedding trained
     * `tasks/${relation}/*.unif`: trained TransE Embeddings
     * `tasks/${relation}/transX`: triples used to train the KB embeddings

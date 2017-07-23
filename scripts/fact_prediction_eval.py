@@ -136,7 +136,7 @@ relation_vec_E = rel_vec_E[relation2id[rel],:]
 ent_vec_R = np.loadtxt(dataPath_ + '/entity2vec.bern')
 rel_vec_R = np.loadtxt(dataPath_ + '/relation2vec.bern')
 M = np.loadtxt(dataPath_ + '/A.bern')
-M = M.reshape([-1,100,100])
+M = M.reshape([-1,50,50])
 relation_vec_R = rel_vec_R[relation2id[rel],:]
 M_vec = M[relation2id[rel],:,:]
 
@@ -259,7 +259,6 @@ rel_vec = np.loadtxt(dataPath_ + '/relation2vec.vec')
 M = np.loadtxt(dataPath_ + '/A.vec')
 M = M.reshape([rel_vec.shape[0],-1])
 
-
 f = open(test_data_path)
 test_data = f.readlines()
 f.close()
@@ -275,63 +274,21 @@ for line in test_data:
 	label = 1 if line[-2] == '+' else 0
 	test_labels.append(label)
 
-
-aps = []
-query = test_pairs[0][0]
-y_true = []
-y_score = []
-
 score_all = []
-
 rel = relation.replace("_", ":")
 d_r = np.expand_dims(rel_vec[relation2id[rel],:],1)
 w_r = np.expand_dims(M[relation2id[rel],:],1)
 
 for idx, sample in enumerate(test_pairs):
 	#print 'query node: ', sample[0], idx
-	if sample[0] == query:
-		h = np.expand_dims(ent_vec[entity2id[sample[0]],:],1)
-		t = np.expand_dims(ent_vec[entity2id[sample[1]],:],1)
+	h = np.expand_dims(ent_vec[entity2id[sample[0]],:],1)
+	t = np.expand_dims(ent_vec[entity2id[sample[1]],:],1)
 
-		h_ = h - np.matmul(w_r.transpose(), h)*w_r
-		t_ = t - np.matmul(w_r.transpose(), t)*w_r
+	h_ = h - np.matmul(w_r.transpose(), h)*w_r
+	t_ = t - np.matmul(w_r.transpose(), t)*w_r
 
-
-		score = -np.sum(np.square(h_ + d_r - t_))
-
-		score_all.append(score)
-		y_score.append(score)
-		y_true.append(test_labels[idx])
-	else:
-		query = sample[0]
-		count = zip(y_score, y_true)
-		count.sort(key = lambda x:x[0], reverse=True)
-		#print count
-		ranks = []
-		correct = 0
-		for idx_, item in enumerate(count):
-			if item[1] == 1:
-				correct +=  1
-				ranks.append(correct/(1.0+idx_))
-		if len(ranks)==0:
-			ranks.append(0)
-		aps.append(np.mean(ranks))
-		y_true = []
-		y_score = []
-
-		h = np.expand_dims(ent_vec[entity2id[sample[0]],:],1)
-		t = np.expand_dims(ent_vec[entity2id[sample[1]],:],1)
-
-		h_ = h - np.matmul(w_r.transpose(), h)*w_r
-		t_ = t - np.matmul(w_r.transpose(), t)*w_r
-
-
-		score = -np.sum(np.square(h_ + d_r - t_))
-
-		score_all.append(score)
-		y_score.append(score)
-		y_true.append(test_labels[idx])
-
+	score = -np.sum(np.square(h_ + d_r - t_))
+	score_all.append(score)
 
 score_label = zip(score_all, test_labels)
 stats = sorted(score_label, key = lambda x:x[0], reverse=True)
@@ -343,5 +300,40 @@ for idx, item in enumerate(stats):
 		correct += 1
 		ranks.append(correct/(1.0+idx))
 ap4 = np.mean(ranks)
-print 'TransX: ', ap4
+print 'TransH: ', ap4
+
+ent_vec_D = np.loadtxt(dataPath_ + '/entity2vec.vec_D')
+rel_vec_D = np.loadtxt(dataPath_ + '/relation2vec.vec_D')
+M_D = np.loadtxt(dataPath_ + '/A.vec_D')
+ent_num = ent_vec_D.shape[0]
+rel_num = rel_vec_D.shape[0]
+rel_tran = M_D[0:rel_num,:]
+ent_tran = M_D[rel_num:,:]
+dim = ent_vec_D.shape[1]
+
+rel_id = relation2id[rel]
+r = np.expand_dims(rel_vec[rel_id,:], 1)
+r_p = np.expand_dims(rel_tran[rel_id,:], 1)
+scores_all_D = []
+for idx, sample in enumerate(test_pairs):
+	h = np.expand_dims(ent_vec_D[entity2id[sample[0]],:], 1)
+	h_p = np.expand_dims(ent_tran[entity2id[sample[0]],:], 1)
+	t = np.expand_dims(ent_vec_D[entity2id[sample[1]],:], 1)
+	t_p = np.expand_dims(ent_tran[entity2id[sample[1]],:], 1)
+	M_rh = np.matmul(r_p, h_p.transpose()) + np.identity(dim)
+	M_rt = np.matmul(r_p, t_p.transpose()) + np.identity(dim)
+	score = - np.sum(np.square(M_rh.dot(h) + r - M_rt.dot(t)))
+	scores_all_D.append(score)
+
+score_label = zip(scores_all_D, test_labels)
+stats = sorted(score_label, key = lambda x:x[0], reverse=True)
+
+correct = 0
+ranks = []
+for idx, item in enumerate(stats):
+	if item[1] == 1:
+		correct += 1
+		ranks.append(correct/(1.0+idx))
+ap5 = np.mean(ranks)
+print 'TransD: ', ap5
 

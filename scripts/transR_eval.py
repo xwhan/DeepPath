@@ -29,7 +29,7 @@ for line in content2:
 ent_vec = np.loadtxt(dataPath_ + '/entity2vec.bern')
 rel_vec = np.loadtxt(dataPath_ + '/relation2vec.bern')
 M = np.loadtxt(dataPath_ + '/A.bern')
-M = M.reshape([-1,100,100])
+M = M.reshape([-1,50,50])
 
 f = open(test_data_path)
 test_data = f.readlines()
