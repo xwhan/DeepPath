@@ -32,6 +32,19 @@ Download the knowledge graph dataset [NELL-995](http://cs.ucsb.edu/~xwhan/datase
     * `tasks/${relation}/path_to_use.txt`: reasoning paths found the RL agent
     * `tasks/${relation}/path_stats.txt`: path frequency of randomised BFS
 
+## Cite
+```
+@InProceedings{wenhan_emnlp2017,
+  author    = {Xiong, Wenhan and Hoang, Thien and Wang, William Yang},
+  title     = {DeepPath: A Reinforcement Learning Method for Knowledge Graph Reasoning},
+  booktitle = {Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing (EMNLP 2017)},
+  month     = {September},
+  year      = {2017},
+  address   = {Copenhagen, Denmark},
+  publisher = {ACL}
+}
+```
+
 ## Acknowledgement
 * [TransX implementations by thunlp](https://github.com/thunlp/Fast-TransX)
 * [Ni Lao's PRA code](http://www.cs.cmu.edu/~nlao/)
