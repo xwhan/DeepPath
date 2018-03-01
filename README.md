@@ -32,7 +32,7 @@ Download the knowledge graph dataset [NELL-995](http://cs.ucsb.edu/~xwhan/datase
     * `tasks/${relation}/path_to_use.txt`: reasoning paths found the RL agent
     * `tasks/${relation}/path_stats.txt`: path frequency of randomised BFS
 
-## Cite
+## If you use our code, please cite the paper
 ```
 @InProceedings{wenhan_emnlp2017,
   author    = {Xiong, Wenhan and Hoang, Thien and Wang, William Yang},
