@@ -312,7 +312,7 @@ ent_tran = M_D[rel_num:,:]
 dim = ent_vec_D.shape[1]
 
 rel_id = relation2id[rel]
-r = np.expand_dims(rel_vec[rel_id,:], 1)
+r = np.expand_dims(rel_vec_D[rel_id,:], 1)
 r_p = np.expand_dims(rel_tran[rel_id,:], 1)
 scores_all_D = []
 for idx, sample in enumerate(test_pairs):
