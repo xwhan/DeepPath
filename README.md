@@ -2,7 +2,7 @@
 We study the problem of learning to reason in large scale knowledge graphs (KGs). More specifically, we describe a novel reinforcement learning framework for learning multi-hop relational paths: we use a policy-based agent with continuous states based on knowledge graph embeddings, which reasons in a KG vector-space by sampling the most promising relation to extend its path. In contrast to prior work, our approach includes a reward function that takes the **accuravy**, **diversity**, and **efficiency** into consideration. Experimentally, we show that our proposed method outperforms a path-ranking based algorithm and knowledge graph embedding methods on Freebase and Never-Ending Language Learning datasets.
 
 ## Access the dataset
-Download the knowledge graph dataset [NELL-995](http://cs.ucsb.edu/~xwhan/datasets/NELL-995.zip) [FB15k-237](http://nlp.cs.ucsb.edu/data/fb15k-237.tar.gz)
+Download the knowledge graph dataset [NELL-995](http://cs.ucsb.edu/~xwhan/datasets/NELL-995.zip) [FB15k-237](https://drive.google.com/file/d/1klWL11nW3ZS6b2MtLW0MHnXu-XlJqDyA/view?usp=sharing)
 
 ## How to run our code 
 1. unzip the data, put the data folder in the code directory
