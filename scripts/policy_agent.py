@@ -1,4 +1,5 @@
 from __future__ import division
+from __future__ import print_function
 import tensorflow as tf
 import numpy as np
 import collections
@@ -56,8 +57,8 @@ def REINFORCE(training_pairs, policy_nn, num_episodes):
 
 	for i_episode in range(num_episodes):
 		start = time.time()
-		print 'Episode %d' % i_episode
-		print 'Training sample: ', train[i_episode][:-1]
+		print('Episode %d' % i_episode)
+		print('Training sample: ', train[i_episode][:-1])
 
 		env = Env(dataPath, train[i_episode])
 
@@ -87,17 +88,17 @@ def REINFORCE(training_pairs, policy_nn, num_episodes):
 
 		# Discourage the agent when it choose an invalid step
 		if len(state_batch_negative) != 0:
-			print 'Penalty to invalid steps:', len(state_batch_negative)
+			print('Penalty to invalid steps:', len(state_batch_negative))
 			policy_nn.update(np.reshape(state_batch_negative, (-1, state_dim)), -0.05, action_batch_negative)
 
-		print '----- FINAL PATH -----'
-		print '\t'.join(env.path)
-		print 'PATH LENGTH', len(env.path)
-		print '----- FINAL PATH -----'
+		print('----- FINAL PATH -----')
+		print('\t'.join(env.path))
+		print('PATH LENGTH', len(env.path))
+		print('----- FINAL PATH -----')
 
 		# If the agent success, do one optimization
 		if done == 1:
-			print 'Success'
+			print('Success')
 
 			path_found_entity.append(path_clean(' -> '.join(env.path)))
 
@@ -139,7 +140,7 @@ def REINFORCE(training_pairs, policy_nn, num_episodes):
 					action_batch.append(transition.action)
 			policy_nn.update(np.reshape(state_batch, (-1,state_dim)), total_reward, action_batch)
 
-			print 'Failed, Do one teacher guideline'
+			print('Failed, Do one teacher guideline')
 			try:
 				good_episodes = teacher(sample[0], sample[1], 1, env, graphpath)
 				for item in good_episodes:
@@ -152,10 +153,10 @@ def REINFORCE(training_pairs, policy_nn, num_episodes):
 					policy_nn.update(np.squeeze(teacher_state_batch), 1, teacher_action_batch)
 
 			except Exception as e:
-				print 'Teacher guideline failed'
-		print 'Episode time: ', time.time() - start
-		print '\n'
-	print 'Success percentage:', success/num_episodes 
+				print('Teacher guideline failed')
+		print('Episode time: ', time.time() - start)
+		print('\n')
+	print('Success percentage:', success/num_episodes)
 
 	for path in path_found_entity:
 		rel_ent = path.split(' -> ')
@@ -172,12 +173,12 @@ def REINFORCE(training_pairs, policy_nn, num_episodes):
 	for item in relation_path_stats:
 		f.write(item[0]+'\t'+str(item[1])+'\n')
 	f.close()
-	print 'Path stats saved'
+	print('Path stats saved')
 
 	return 
 
 def retrain():
-	print 'Start retraining'
+	print('Start retraining')
 	tf.reset_default_graph()
 	policy_network = PolicyNetwork(scope = 'supervised_policy')
 
@@ -188,13 +189,13 @@ def retrain():
 	saver = tf.train.Saver()
 	with tf.Session() as sess:
 		saver.restore(sess, 'models/policy_supervised_' + relation)
-		print "sl_policy restored"
+		print("sl_policy restored")
 		episodes = len(training_pairs)
 		if episodes > 300:
 			episodes = 300
 		REINFORCE(training_pairs, policy_network, episodes)
 		saver.save(sess, 'models/policy_retrained' + relation)
-	print 'Retrained model saved'
+	print('Retrained model saved')
 
 def test():
 	tf.reset_default_graph()
@@ -216,13 +217,13 @@ def test():
 
 	with tf.Session() as sess:
 		saver.restore(sess, 'models/policy_retrained' + relation)
-		print 'Model reloaded'
+		print('Model reloaded')
 
 		if test_num > 500:
 			test_num = 500
 
-		for episode in xrange(test_num):
-			print 'Test sample %d: %s' % (episode,test_data[episode][:-1])
+		for episode in range(test_num):
+			print('Test sample %d: %s' % (episode,test_data[episode][:-1]))
 			env = Env(dataPath, test_data[episode])
 			sample = test_data[episode].split()
 			state_idx = [env.entity2id_[sample[0]], env.entity2id_[sample[1]], 0]
@@ -243,11 +244,11 @@ def test():
 				if done or t == max_steps_test:
 					if done:
 						success += 1
-						print "Success\n"
+						print("Success\n")
 						path = path_clean(' -> '.join(env.path))
 						path_found.append(path)
 					else:
-						print 'Episode ends due to step limit\n'
+						print('Episode ends due to step limit\n')
 					break
 				state_idx = new_state
 			
@@ -258,7 +259,7 @@ def test():
 					path_found_embedding = np.reshape(path_found_embedding, (-1,embedding_dim))
 					cos_sim = cosine_similarity(path_found_embedding, curr_path_embedding)
 					diverse_reward = -np.mean(cos_sim)
-					print 'diverse_reward', diverse_reward
+					print('diverse_reward', diverse_reward)
 					#total_reward = 0.1*global_reward + 0.8*length_reward + 0.1*diverse_reward 
 					state_batch = []
 					action_batch = []
@@ -289,13 +290,13 @@ def test():
 		ranking_path.append((path, length))
 
 	ranking_path = sorted(ranking_path, key = lambda x:x[1])
-	print 'Success persentage:', success/test_num
+	print('Success persentage:', success/test_num)
 
 	f = open(dataPath + 'tasks/' + relation + '/' + 'path_to_use.txt', 'w')
 	for item in ranking_path:
 		f.write(item[0] + '\n')
 	f.close()
-	print 'path to use saved'
+	print('path to use saved')
 	return
 
 if __name__ == "__main__":

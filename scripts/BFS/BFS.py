@@ -1,4 +1,7 @@
-from Queue import Queue
+try:
+    from Queue import Queue
+except ImportError:
+    from queue import Queue
 import random
 
 def BFS(kb, entity1, entity2):
