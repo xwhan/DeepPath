@@ -1,5 +1,3 @@
-from __future__ import division
-from __future__ import print_function
 import random
 from collections import namedtuple, Counter
 import numpy as np
@@ -21,7 +19,7 @@ target_update_freq = 1000
 max_steps = 50
 max_steps_test = 50
 
-dataPath = '../NELL-995/'
+dataPath = '../FB15k-237/'
 
 Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
 

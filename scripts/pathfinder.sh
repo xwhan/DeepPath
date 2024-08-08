@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 relation=$1
 python sl_policy.py $relation

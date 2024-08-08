@@ -1,5 +1,3 @@
-from __future__ import division
-from __future__ import print_function
 import tensorflow as tf
 import numpy as np
 import collections
@@ -13,34 +11,37 @@ from utils import *
 from env import Env
 
 
+# Disable eager execution
+# Else leads to an error in tf v2 due to incompatibility with placeholders.
+tf.compat.v1.disable_eager_execution()
+
 relation = sys.argv[1]
 task = sys.argv[2]
 graphpath = dataPath + 'tasks/' + relation + '/' + 'graph.txt'
 relationPath = dataPath + 'tasks/' + relation + '/' + 'train_pos'
 
 class PolicyNetwork(object):
-
 	def __init__(self, scope = 'policy_network', learning_rate = 0.001):
-		self.initializer = tf.contrib.layers.xavier_initializer()
-		with tf.variable_scope(scope):
-			self.state = tf.placeholder(tf.float32, [None, state_dim], name = 'state')
-			self.action = tf.placeholder(tf.int32, [None], name = 'action')
-			self.target = tf.placeholder(tf.float32, name = 'target')
+		self.initializer = tf.keras.initializers.GlorotUniform()
+		with tf.compat.v1.variable_scope(scope):
+			self.state = tf.compat.v1.placeholder(tf.float32, [None, state_dim], name='state')
+			self.action = tf.compat.v1.placeholder(tf.int32, [None], name='action')
+			self.target = tf.compat.v1.placeholder(tf.float32, name='target')
 			self.action_prob = policy_nn(self.state, state_dim, action_space, self.initializer)
 
 			action_mask = tf.cast(tf.one_hot(self.action, depth = action_space), tf.bool)
 			self.picked_action_prob = tf.boolean_mask(self.action_prob, action_mask)
 
-			self.loss = tf.reduce_sum(-tf.log(self.picked_action_prob)*self.target) + sum(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES, scope=scope))
-			self.optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate)
+			self.loss = tf.reduce_sum(-tf.math.log(self.picked_action_prob) * self.target) + sum(tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.REGULARIZATION_LOSSES, scope=scope))
+			self.optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=learning_rate)
 			self.train_op = self.optimizer.minimize(self.loss)
 
 	def predict(self, state, sess = None):
-		sess = sess or tf.get_default_session()
+		sess = sess or tf.compat.v1.get_default_session()
 		return sess.run(self.action_prob, {self.state:state})
 
 	def update(self, state, target, action, sess=None):
-		sess = sess or tf.get_default_session()
+		sess = sess or tf.compat.v1.get_default_session()
 		feed_dict = { self.state: state, self.target: target, self.action: action  }
 		_, loss = sess.run([self.train_op, self.loss], feed_dict)
 		return loss
@@ -179,15 +180,15 @@ def REINFORCE(training_pairs, policy_nn, num_episodes):
 
 def retrain():
 	print('Start retraining')
-	tf.reset_default_graph()
+	tf.compat.v1.reset_default_graph()
 	policy_network = PolicyNetwork(scope = 'supervised_policy')
 
 	f = open(relationPath)
 	training_pairs = f.readlines()
 	f.close()
 
-	saver = tf.train.Saver()
-	with tf.Session() as sess:
+	saver = tf.compat.v1.train.Saver()
+	with tf.compat.v1.Session() as sess:
 		saver.restore(sess, 'models/policy_supervised_' + relation)
 		print("sl_policy restored")
 		episodes = len(training_pairs)
@@ -198,7 +199,7 @@ def retrain():
 	print('Retrained model saved')
 
 def test():
-	tf.reset_default_graph()
+	tf.compat.v1.reset_default_graph()
 	policy_network = PolicyNetwork(scope = 'supervised_policy')
 
 	f = open(relationPath)
@@ -210,12 +211,12 @@ def test():
 
 	success = 0
 
-	saver = tf.train.Saver()
+	saver = tf.compat.v1.train.Saver()
 	path_found = []
 	path_relation_found = []
 	path_set = set()
 
-	with tf.Session() as sess:
+	with tf.compat.v1.Session() as sess:
 		saver.restore(sess, 'models/policy_retrained' + relation)
 		print('Model reloaded')
 

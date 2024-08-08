@@ -5,47 +5,49 @@ import numpy as np
 from BFS.KB import *
 from sklearn import linear_model
 from keras.models import Sequential 
-from keras.layers import Dense, Activation
+from keras.layers import Dense, Activation, Input
+from utils import dataPath
 
 relation = sys.argv[1]
 
-dataPath_ = '../NELL-995/tasks/'  + relation
+dataPath_ = dataPath + '/tasks/' + relation
 featurePath = dataPath_ + '/path_to_use.txt'
 feature_stats = dataPath_ + '/path_stats.txt'
-relationId_path = '../NELL-995/relation2id.txt'
+relationId_path = dataPath + '/relation2id.txt'
+
+def import_file(filename):
+    with open(filename) as f:
+        content = f.readlines()
+    return content
 
 def train(kb, kb_inv, named_paths):
-	f = open(dataPath_ + '/train.pairs')
-	train_data = f.readlines()
-	f.close()
-	train_pairs = []
+	train_data = import_file(dataPath_ + '/train.pairs')
 	train_labels = []
+	training_features = []
 	for line in train_data:
-		e1 = line.split(',')[0].replace('thing$','')
-		e2 = line.split(',')[1].split(':')[0].replace('thing$','')
+		e1, e2 = line.split(':')[0].replace('thing$', '/').replace('_', '/').split(',')
 		if (e1 not in kb.entities) or (e2 not in kb.entities):
 			continue
-		train_pairs.append((e1,e2))
+
 		label = 1 if line[-2] == '+' else 0
 		train_labels.append(label)
-	training_features = []
-	for sample in train_pairs:
+
 		feature = []
 		for path in named_paths:
-				feature.append(int(bfs_two(sample[0], sample[1], path, kb, kb_inv)))
+			feature.append(int(bfs_two(e1, e2, path, kb, kb_inv)))
 		training_features.append(feature)
+
 	model = Sequential()
-	input_dim = len(named_paths)
-	model.add(Dense(1, activation='sigmoid' ,input_dim=input_dim))
+	model.add(Input(shape=(len(named_paths), )))
+	model.add(Dense(1, activation='sigmoid'))
 	model.compile(optimizer = 'rmsprop', loss='binary_crossentropy', metrics=['accuracy'])
-	model.fit(training_features, train_labels, nb_epoch=300, batch_size=128)
+	model.fit(np.array(training_features), np.array(train_labels), epochs=300, batch_size=128)
 	return model
+
 
 def get_features():
 	stats = {}
-	f = open(feature_stats)
-	path_freq = f.readlines()
-	f.close()
+	path_freq = import_file(feature_stats)
 	for line in path_freq:
 		path = line.split('\t')[0]
 		num = int(line.split('\t')[1])
@@ -53,20 +55,15 @@ def get_features():
 	max_freq = np.max(stats.values())
 
 	relation2id = {}
-	f = open(relationId_path)
-	content = f.readlines()
-	f.close()
+	content = import_file(relationId_path)
 	for line in content:
 		relation2id[line.split()[0]] = int(line.split()[1])
 
-	useful_paths = []
+	paths = import_file(featurePath)
+	print('#total paths imported: ', len(paths))
+
 	named_paths = []
-	f = open(featurePath)
-	paths = f.readlines()
-	f.close()
-
-	print len(paths)
-
+	useful_paths = []
 	for line in paths:
 		path = line.rstrip()
 
@@ -84,17 +81,13 @@ def get_features():
 			useful_paths.append(pathIndex)
 			named_paths.append(pathName)
 
-	print 'How many paths used: ', len(useful_paths)
+	print('#paths used: ', len(useful_paths))
 	return useful_paths, named_paths
 
 def evaluate_logic():
 	kb = KB()
 	kb_inv = KB()
-
-	f = open(dataPath_ + '/graph.txt')
-	kb_lines = f.readlines()
-	f.close()
-
+	kb_lines = import_file(dataPath_ + '/graph.txt')
 	for line in kb_lines:
 		e1 = line.split()[0]
 		rel = line.split()[1]
@@ -106,18 +99,12 @@ def evaluate_logic():
 
 	model = train(kb, kb_inv, named_paths)
 
-
-	f = open(dataPath_ + '/sort_test.pairs')
-	test_data = f.readlines()
-	f.close()
+	test_data = import_file(dataPath_ + '/sort_test.pairs')
 	test_pairs = []
 	test_labels = []
 	# queries = set()
 	for line in test_data:
-		e1 = line.split(',')[0].replace('thing$','')
-		# e1 = '/' + e1[0] + '/' + e1[2:]
-		e2 = line.split(',')[1].split(':')[0].replace('thing$','')
-		# e2 = '/' + e2[0] + '/' + e2[2:]
+		e1, e2 = line.split(':')[0].replace('thing$', '/').replace('_', '/').split(',')
 		if (e1 not in kb.entities) or (e2 not in kb.entities):
 			continue
 		test_pairs.append((e1,e2))
@@ -148,7 +135,7 @@ def evaluate_logic():
 			y_true.append(test_labels[idx])
 		else:
 			query = sample[0]
-			count = zip(y_score, y_true)
+			count = list(zip(y_score, y_true))
 			count.sort(key = lambda x:x[0], reverse=True)
 			ranks = []
 			correct = 0
@@ -181,7 +168,7 @@ def evaluate_logic():
 			y_true.append(test_labels[idx])
 			# print y_score, y_true
 
-	count = zip(y_score, y_true)
+	count = list(zip(y_score, y_true))
 	count.sort(key = lambda x:x[0], reverse=True)
 	ranks = []
 	correct = 0
@@ -195,7 +182,7 @@ def evaluate_logic():
 	score_label_ranked = sorted(score_label, key = lambda x:x[0], reverse=True)
 
 	mean_ap = np.mean(aps)
-	print 'RL MAP: ', mean_ap
+	print('RL MAP: ', mean_ap)
 
 
 def bfs_two(e1,e2,path,kb,kb_inv):

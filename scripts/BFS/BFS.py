@@ -1,7 +1,4 @@
-try:
-    from Queue import Queue
-except ImportError:
-    from queue import Queue
+from queue import Queue
 import random
 
 def BFS(kb, entity1, entity2):
@@ -28,7 +25,7 @@ def test():
 class foundPaths(object):
 	def __init__(self, kb):
 		self.entities = {}
-		for entity, relations in kb.entities.iteritems():
+		for entity, relations in kb.entities.items():
 			self.entities[entity] = (False, "", "")
 
 	def isFound(self, entity):

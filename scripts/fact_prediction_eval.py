@@ -3,16 +3,18 @@
 import numpy as np 
 import sys
 from BFS.KB import *
+from utils import dataPath
+
 
 relation = sys.argv[1]
 
-dataPath_ = '../NELL-995/tasks/'  + relation
+dataPath_ = dataPath + '/tasks/'  + relation
 featurePath = dataPath_ + '/path_to_use.txt'
 feature_stats = dataPath_ + '/path_stats.txt'
-relationId_path ='../NELL-995/' + 'relation2id.txt'
-ent_id_path = '../NELL-995/' + 'entity2id.txt'
-rel_id_path = '../NELL-995/' + 'relation2id.txt'
-test_data_path = '../NELL-995/tasks/'  + relation + '/sort_test.pairs'
+relationId_path = dataPath + 'relation2id.txt'
+ent_id_path = dataPath' + 'entity2id.txt'
+rel_id_path = dataPath + 'relation2id.txt'
+test_data_path = dataPath_ + '/sort_test.pairs'
 
 def bfs_two(e1,e2,path,kb,kb_inv):
 	start = 0
@@ -39,9 +41,9 @@ def bfs_two(e1,e2,path,kb,kb_inv):
 						if path_.relation == left_step:
 							left_next.add(path_.connected_entity)
 				except Exception as e:
-					print 'left', len(left)
-					print left
-					print 'not such entity'
+					print('left', len(left))
+					print(left)
+					print('no such entity')
 					return False
 			left = left_next
 
@@ -54,8 +56,8 @@ def bfs_two(e1,e2,path,kb,kb_inv):
 						if path_.relation == right_step:
 							right_next.add(path_.connected_entity)
 				except Exception as e:
-					print 'right', len(right)
-					print 'no such entity'
+					print('right', len(right))
+					print('no such entity')
 					return False
 			right = right_next
 
@@ -110,7 +112,7 @@ def get_features():
 			useful_paths.append(pathIndex)
 			named_paths.append(pathName)
 
-	print 'How many paths used: ', len(useful_paths)
+	print('How many paths used: ', len(useful_paths))
 	return useful_paths, named_paths
 
 f1 = open(ent_id_path)
@@ -182,9 +184,9 @@ scores_E = []
 scores_R = []
 scores_rl = []
 
-print 'How many queries: ', len(test_pairs)
+print('How many queries: ', len(test_pairs))
 for idx, sample in enumerate(test_pairs):
-	print 'Query No.%d of %d' % (idx, len(test_pairs))
+	print('Query No.%d of %d' % (idx, len(test_pairs)))
 	e1_vec_E = ent_vec_E[entity2id[sample[0]],:]
 	e2_vec_E = ent_vec_E[entity2id[sample[1]],:]
 	score_E = -np.sum(np.square(e1_vec_E + relation_vec_E - e2_vec_E))
@@ -218,7 +220,7 @@ for idx, item in enumerate(rank_stats_E):
 		correct += 1
 		ranks.append(correct/(1.0+idx))
 ap1 = np.mean(ranks)
-print 'TransE: ', ap1
+print('TransE: ', ap1)
 
 correct = 0
 ranks = []
@@ -227,7 +229,7 @@ for idx, item in enumerate(rank_stats_R):
 		correct += 1
 		ranks.append(correct/(1.0+idx))
 ap2 = np.mean(ranks)
-print 'TransR: ', ap2
+print('TransR: ', ap2)
 
 
 correct = 0
@@ -237,7 +239,7 @@ for idx, item in enumerate(rank_stats_rl):
 		correct += 1
 		ranks.append(correct/(1.0+idx))
 ap3 = np.mean(ranks)
-print 'RL: ', ap3
+print('RL: ', ap3)
 
 f1 = open(ent_id_path)
 f2 = open(rel_id_path)
@@ -300,7 +302,7 @@ for idx, item in enumerate(stats):
 		correct += 1
 		ranks.append(correct/(1.0+idx))
 ap4 = np.mean(ranks)
-print 'TransH: ', ap4
+print('TransH: ', ap4)
 
 ent_vec_D = np.loadtxt(dataPath_ + '/entity2vec.vec_D')
 rel_vec_D = np.loadtxt(dataPath_ + '/relation2vec.vec_D')
@@ -335,5 +337,5 @@ for idx, item in enumerate(stats):
 		correct += 1
 		ranks.append(correct/(1.0+idx))
 ap5 = np.mean(ranks)
-print 'TransD: ', ap5
+print('TransD: ', ap5)
 

@@ -27,7 +27,7 @@ class Env(object):
 		self.path_relations = []
 
 		# Knowledge Graph for path finding
-		f = open(dataPath + 'kb_env_rl.txt')
+		f = open(dataPath + 'kb_env.txt')
 		kb_all = f.readlines()
 		f.close()
 
